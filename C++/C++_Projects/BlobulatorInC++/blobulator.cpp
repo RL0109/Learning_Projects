@@ -201,7 +201,7 @@ class Blobulator
     }
 
     bool operator>(Blobulator blob2) {
-        if (this-> HBlobCount() < blob2.HBlobCount())
+        if (this-> HBlobCount() > blob2.HBlobCount())
             return true;
         else
             return false;
