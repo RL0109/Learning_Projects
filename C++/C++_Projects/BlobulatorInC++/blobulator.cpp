@@ -17,23 +17,27 @@ class Blobulator
         int length;
         float hydropathy; 
 
-    
+    Blobulator(std::string aC, int l, float h) {
+        aminoCode = aC;
+        length = l;
+        hydropathy = h;
+    }
 
-    void acquireValues (std::string& aaCode) {
-        for (auto aminoLetter: aaCode) {
+    void acquireValues () {
+        for (auto aminoLetter: aminoCode) {
             hydroVal.push_back( KTNormalizedAminoScores[aminoLetter]);
         }
     }
 
-    void averageValues (std::vector<float>& hydroValue)
+    void averageValues ()
     {
-        for (std::vector<float>::iterator it = hydroValue.begin(); it != hydroValue.end(); it++ ) 
+        for (std::vector<float>::iterator it = hydroVal.begin(); it != hydroVal.end(); it++ ) 
             {
-                if (it == hydroValue.begin()) {
+                if (it == hydroVal.begin()) {
                     hydroAvg.push_back((*it + *(it + 1)) / 2);
                     continue;
                 }
-                if (it == hydroValue.end()-1) {
+                if (it == hydroVal.end()-1) {
                     hydroAvg.push_back((*(it - 1) + *it) / 2);
                     continue;
                 }
@@ -47,7 +51,7 @@ class Blobulator
         }
     }
 
-    void assignHydro (std::vector<float>& hydroAverage) {
+    void assignHydro () {
         for (auto value : hydroAvg) {
             if (value < hydropathy) {
                 hydroCheck.push_back('0');
@@ -63,7 +67,7 @@ class Blobulator
         hydroBinary = hydroCheck; // Assigned for sanity checking
     }   
 
-    void determineHblobs (std::string& hydroBinary) {
+    void determineHblobs () {
         auto n = hydroBinary.size();
         int i = 0;
         int hlength = 0;
@@ -94,7 +98,7 @@ class Blobulator
 
     }
 
-    void determinePblobs (std::string& hydroBinary) {
+    void determinePblobs () {
         auto n = hydroBinary.size();
         int i = 0;
         int plength = 0;
@@ -140,21 +144,25 @@ class Blobulator
 
 
 int main() {
-    Blobulator blob;
+    std::string aminoCode;
+    float hydropathy;
+    int length;
     
     std::cout << "Please Input a FASTA Sequence:";
-    std::cin >> blob.aminoCode;
+    std::cin >> aminoCode;
     std::cout << "\nPlease Input Hydropathy Minimum:";
-    std::cin >> blob.hydropathy;
+    std::cin >> hydropathy;
     std::cout << "\nPlease Input Length Minimum:";
-    std::cin >> blob.length;
+    std::cin >> length;
     std::cout << "\n";
+
+    Blobulator blob(aminoCode, length, hydropathy);
     
-    blob.acquireValues(blob.aminoCode);
-    blob.averageValues(blob.hydroVal);
-    blob.assignHydro(blob.hydroAvg);
-    blob.determineHblobs(blob.hydroBinary); 
-    blob.determinePblobs(blob.hydroBinary);
+    blob.acquireValues();
+    blob.averageValues();
+    blob.assignHydro();
+    blob.determineHblobs(); 
+    blob.determinePblobs();
     std::cout << "Blobulated!\n" << "Comparing Sequence to Binary to Blobs\n----------------\n"
     << "Sequence: " << blob.aminoCode
     << "\n----------------\nBinary: " << blob.hydroCheck 
