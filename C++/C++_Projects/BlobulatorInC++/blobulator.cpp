@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <regex>
+#include <iomanip>
 #include <unordered_map>
 #include "AminoScores.h"
 
@@ -148,11 +149,11 @@ int main() {
     float hydropathy;
     int length;
     
-    std::cout << "Please Input a FASTA Sequence:";
+    std::cout << "Please Input a FASTA Sequence (Human Amino Acids Only):";
     std::cin >> aminoCode;
-    std::cout << "\nPlease Input Hydropathy Minimum:";
+    std::cout << "\nPlease Input Hydropathy Minimum (0.0 - 1.0):";
     std::cin >> hydropathy;
-    std::cout << "\nPlease Input Length Minimum:";
+    std::cout << "\nPlease Input Length Minimum (0 - Sequence Length):";
     std::cin >> length;
     std::cout << "\n";
 
@@ -163,10 +164,12 @@ int main() {
     blob.assignHydro();
     blob.determineHblobs(); 
     blob.determinePblobs();
-    std::cout << "Blobulated!\n" << "Comparing Sequence to Binary to Blobs\n----------------\n"
-    << "Sequence: " << blob.aminoCode
+    std::cout << "Blobulated!\n" 
+    << "Comparing Sequence to Binary to Blobs\n----------------\n"
+    << "Sequence: " << blob.aminoCode 
     << "\n----------------\nBinary: " << blob.hydroCheck 
-    <<"\n----------------\nBlob Assignment: " << blob.hydroBinary << "\n" 
+    <<"\n----------------\nBlob Assignment: " 
+    << blob.hydroBinary << "\n" 
     <<std::endl;
     system("pause");
 }
