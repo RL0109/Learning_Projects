@@ -17,130 +17,130 @@
 
 class Blobulator 
 {
-    
-    // Uses amino codes to get Kyte - Doolittle hydropathy scores
-    void acquireValues () {
-        for (auto aminoLetter: aminoCode) {
-            hydroVal.push_back( KTNormalizedAminoScores[aminoLetter]);
-        }
-    }
-
-    // Compares values between an amino's neighbors to see if the average 
-    // is below the hydropathy threshold
-    void averageValues ()
-    {
-        for (std::vector<float>::iterator it = hydroVal.begin(); it != hydroVal.end(); it++ ) 
-            {
-                if (it == hydroVal.begin()) {
-                    hydroAvg.push_back((*it + *(it + 1)) / 2);
-                    continue;
-                }
-                if (it == hydroVal.end()-1) {
-                    hydroAvg.push_back((*(it - 1) + *it) / 2);
-                    continue;
-                }
-                hydroAvg.push_back((*(it -1) + *it + *(it + 1))/3);
+    private: 
+        // Uses amino codes to get Kyte - Doolittle hydropathy scores
+        void acquireValues () {
+            for (auto aminoLetter: aminoCode) {
+                hydroVal.push_back( KTNormalizedAminoScores[aminoLetter]);
             }
-
-        if (hydroAvg.size() != hydroVal.size()) {
-            std::cout << "Vector lengths do not match!" << std::endl;
-            std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
-            << "HydroValue Size: " << hydroVal.size() << std::endl;
         }
-    }
 
-    // Populates the binary string with 0's for polar and 1's for hydrophobic
-    void assignHydro () {
-        for (auto value : hydroAvg) {
-            if (value < hydropathy) {
-                hydroBinary.push_back('0');
-                } else {
-                hydroBinary.push_back('1');
+        // Compares values between an amino's neighbors to see if the average 
+        // is below the hydropathy threshold
+        void averageValues ()
+        {
+            for (std::vector<float>::iterator it = hydroVal.begin(); it != hydroVal.end(); it++ ) 
+                {
+                    if (it == hydroVal.begin()) {
+                        hydroAvg.push_back((*it + *(it + 1)) / 2);
+                        continue;
+                    }
+                    if (it == hydroVal.end()-1) {
+                        hydroAvg.push_back((*(it - 1) + *it) / 2);
+                        continue;
+                    }
+                    hydroAvg.push_back((*(it -1) + *it + *(it + 1))/3);
                 }
-        }
-        if (hydroAvg.size() != hydroBinary.size()) {
-            std::cout << "Vector lengths do not match!" << std::endl;
-            std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
-            << "hydroBinary Size: " << hydroBinary.size() << std::endl;
-        }
-        hydroCharacter = hydroBinary; // Created copy for string mutation
-    }   
 
-    //Check binary string if enough contiguous hydrophobic amino's match or pass the 
-    // length minimum.
-    void determineHblobs () {
-        auto n = hydroCharacter.size();
-        int i = 0;
-        int hlength = 0;
-        int plength = 0;
-        int start = 0;
-        while (i < n) {
-            if (hydroCharacter[i] != '0' && hlength < 1) {
-                start = i;
-            } 
-            if (hydroCharacter[i] != '0') {
-                ++hlength;
+            if (hydroAvg.size() != hydroVal.size()) {
+                std::cout << "Vector lengths do not match!" << std::endl;
+                std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
+                << "HydroValue Size: " << hydroVal.size() << std::endl;
             }
-
-            if ((hydroCharacter[i] == '0' || i == n-1) && hlength > length - 1) {
-                int end = start + hlength;
-                for (int j = start; j != end; j++) {
-                    hydroCharacter[j] = 'h';
-                }
-                hlength = 0;
-            
-            
-            } 
-            if (hydroCharacter[i] == '0' && hlength < length) {
-                hlength = 0;
-            }
-            ++i;
         }
 
-    }
+        // Populates the binary string with 0's for polar and 1's for hydrophobic
+        void assignHydro () {
+            for (auto value : hydroAvg) {
+                if (value < hydropathy) {
+                    hydroBinary.push_back('0');
+                    } else {
+                    hydroBinary.push_back('1');
+                    }
+            }
+            if (hydroAvg.size() != hydroBinary.size()) {
+                std::cout << "Vector lengths do not match!" << std::endl;
+                std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
+                << "hydroBinary Size: " << hydroBinary.size() << std::endl;
+            }
+            hydroCharacter = hydroBinary; // Created copy for string mutation
+        }   
 
-    // Looks for consecutive 0's that pass the length min.
-    // Failure marks the character for s as in short
-    void determinePblobs () {
-        auto n = hydroCharacter.size();
-        int i = 0;
-        int plength = 0;
-        int start = 0;
-
-        while (i < n) {
-            if (hydroCharacter[i] != 'h') {
-                if (plength == 0) {
+        //Check binary string if enough contiguous hydrophobic amino's match or pass the 
+        // length minimum.
+        void determineHblobs () {
+            auto n = hydroCharacter.size();
+            int i = 0;
+            int hlength = 0;
+            int plength = 0;
+            int start = 0;
+            while (i < n) {
+                if (hydroCharacter[i] != '0' && hlength < 1) {
                     start = i;
+                } 
+                if (hydroCharacter[i] != '0') {
+                    ++hlength;
                 }
-                ++plength;
-            }           
 
-            if ((hydroCharacter[i] == 'h' || i == n-1) && plength > 0) {
-                if (plength > length - 1) {
-                    int end = plength + start;
+                if ((hydroCharacter[i] == '0' || i == n-1) && hlength > length - 1) {
+                    int end = start + hlength;
                     for (int j = start; j != end; j++) {
-                        hydroCharacter[j] = 'p';
+                        hydroCharacter[j] = 'h';
                     }
-                    plength = 0;
-                } else if (plength < length) {
-                    int end = plength + start;
-                    for (int j = start; j != end; j++) {
-                        hydroCharacter[j] = 's';
-                    }
-                    plength = 0;
+                    hlength = 0;
+                
+                
+                } 
+                if (hydroCharacter[i] == '0' && hlength < length) {
+                    hlength = 0;
                 }
-            
+                ++i;
             }
-            i++;
-        
+
         }
 
-        if (hydroCharacter.size() != hydroBinary.size() ) {
-            std::cout << "Sizes do not match!" << "\nHydro Binary Size: "
-            << hydroBinary.size() << "\nHydro Average Size: "  <<
-            hydroAvg.size() << "\n";
+        // Looks for consecutive 0's that pass the length min.
+        // Failure marks the character for s as in short
+        void determinePblobs () {
+            auto n = hydroCharacter.size();
+            int i = 0;
+            int plength = 0;
+            int start = 0;
+
+            while (i < n) {
+                if (hydroCharacter[i] != 'h') {
+                    if (plength == 0) {
+                        start = i;
+                    }
+                    ++plength;
+                }           
+
+                if ((hydroCharacter[i] == 'h' || i == n-1) && plength > 0) {
+                    if (plength > length - 1) {
+                        int end = plength + start;
+                        for (int j = start; j != end; j++) {
+                            hydroCharacter[j] = 'p';
+                        }
+                        plength = 0;
+                    } else if (plength < length) {
+                        int end = plength + start;
+                        for (int j = start; j != end; j++) {
+                            hydroCharacter[j] = 's';
+                        }
+                        plength = 0;
+                    }
+                
+                }
+                i++;
+            
             }
-    }
+
+            if (hydroCharacter.size() != hydroBinary.size() ) {
+                std::cout << "Sizes do not match!" << "\nHydro Binary Size: "
+                << hydroBinary.size() << "\nHydro Average Size: "  <<
+                hydroAvg.size() << "\n";
+                }
+        }
 
 
 
