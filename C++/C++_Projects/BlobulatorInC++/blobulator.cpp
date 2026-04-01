@@ -1,3 +1,10 @@
+/*
+    This is the basic blobulator algorithm designed in C++ 
+*/
+
+
+
+
 #include <iostream>
 #include <string>
 #include <vector>
