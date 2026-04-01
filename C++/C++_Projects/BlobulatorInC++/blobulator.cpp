@@ -17,28 +17,7 @@
 
 class Blobulator 
 {
-    public:
-        std::string aminoCode;
-        std::string hydroBinary;
-        std::string hydroCharacter;
-        std::vector<float> hydroVal;
-        std::vector<float> hydroAvg;
-        int length;
-        float hydropathy; 
-
-    // Blobulator Constructor
-    Blobulator(std::string aC, int l, float h) {
-        aminoCode = aC;
-        length = l;
-        hydropathy = h;
-
-        acquireValues();
-        averageValues();
-        assignHydro();
-        determineHblobs(); 
-        determinePblobs();
-    }
-
+    
     // Uses amino codes to get Kyte - Doolittle hydropathy scores
     void acquireValues () {
         for (auto aminoLetter: aminoCode) {
@@ -163,6 +142,32 @@ class Blobulator
             }
     }
 
+
+
+    public:
+        std::string aminoCode;
+        std::string hydroBinary;
+        std::string hydroCharacter;
+        std::vector<float> hydroVal;
+        std::vector<float> hydroAvg;
+        int length;
+        float hydropathy; 
+
+    // Blobulator Constructor
+    Blobulator(std::string aC, int l, float h) {
+        aminoCode = aC;
+        length = l;
+        hydropathy = h;
+
+        acquireValues();
+        averageValues();
+        assignHydro();
+        determineHblobs(); 
+        determinePblobs();
+    }
+
+    
+
     // Helper functions 
     
     
@@ -171,7 +176,7 @@ class Blobulator
         int i = 0;
         int hNumber = 0;
         while (i < hydroBinary.size()) {
-            if (hydroBinary[i] == '1');
+            if (hydroBinary[i] == '1')
                 hNumber++;
             i++;
         }
