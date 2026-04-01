@@ -26,6 +26,7 @@ class Blobulator
         int length;
         float hydropathy; 
 
+    // Blobulator Constructor
     Blobulator(std::string aC, int l, float h) {
         aminoCode = aC;
         length = l;
@@ -38,12 +39,15 @@ class Blobulator
         determinePblobs();
     }
 
+    // Uses amino codes to get Kyte - Doolittle hydropathy scores
     void acquireValues () {
         for (auto aminoLetter: aminoCode) {
             hydroVal.push_back( KTNormalizedAminoScores[aminoLetter]);
         }
     }
 
+    // Compares values between an amino's neighbors to see if the average 
+    // is below the hydropathy threshold
     void averageValues ()
     {
         for (std::vector<float>::iterator it = hydroVal.begin(); it != hydroVal.end(); it++ ) 
@@ -66,6 +70,7 @@ class Blobulator
         }
     }
 
+    // Populates the binary string with 0's for polar and 1's for hydrophobic
     void assignHydro () {
         for (auto value : hydroAvg) {
             if (value < hydropathy) {
@@ -82,6 +87,8 @@ class Blobulator
         hydroCharacter = hydroBinary; // Created copy for string mutation
     }   
 
+    //Check binary string if enough contiguous hydrophobic amino's match or pass the 
+    // length minimum.
     void determineHblobs () {
         auto n = hydroCharacter.size();
         int i = 0;
@@ -113,6 +120,8 @@ class Blobulator
 
     }
 
+    // Looks for consecutive 0's that pass the length min.
+    // Failure marks the character for s as in short
     void determinePblobs () {
         auto n = hydroCharacter.size();
         int i = 0;
@@ -164,13 +173,15 @@ class Blobulator
         while (i < hydroBinary.size()) {
             if (hydroBinary[i] == '1');
                 hNumber++;
-
             i++;
-
         }
         return hNumber;
 
     }
+
+
+
+    
 
 
 
@@ -211,6 +222,7 @@ int main() {
     std::cin >> length;
     std::cout << "\n";
 
+    // Demonstrates the difference between sequence, binary, and characters.
     Blobulator blob(aminoCode, length, hydropathy);
     std::cout << "Blobulated!\n" 
     << "Comparing Sequence to Binary to Blobs\n----------------\n"
