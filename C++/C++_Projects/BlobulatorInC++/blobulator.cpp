@@ -1,5 +1,6 @@
 /*
-    This is the basic blobulator algorithm designed in C++ 
+    This is the basic blobulator algorithm designed in C++.
+    Intended for learning purposes only.
 */
 
 
