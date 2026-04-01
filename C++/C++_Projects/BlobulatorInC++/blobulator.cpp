@@ -9,10 +9,6 @@
 class Blobulator 
 {
     public:
-
-    struct blobData // There is no difference between classes and structs, this
-    // just seperates the data from the functions.
-    {
         std::string aminoCode;
         std::string hydroCheck; // Sanity check
         std::string hydroBinary;
@@ -21,13 +17,11 @@ class Blobulator
         int length;
         float hydropathy; 
 
-    };
-
-    blobData data; // Initialize data type
+    
 
     void acquireValues (std::string& aaCode) {
         for (auto aminoLetter: aaCode) {
-            data.hydroVal.push_back( KTNormalizedAminoScores[aminoLetter]);
+            hydroVal.push_back( KTNormalizedAminoScores[aminoLetter]);
         }
     }
 
@@ -36,37 +30,37 @@ class Blobulator
         for (std::vector<float>::iterator it = hydroValue.begin(); it != hydroValue.end(); it++ ) 
             {
                 if (it == hydroValue.begin()) {
-                    data.hydroAvg.push_back((*it + *(it + 1)) / 2);
+                    hydroAvg.push_back((*it + *(it + 1)) / 2);
                     continue;
                 }
                 if (it == hydroValue.end()-1) {
-                    data.hydroAvg.push_back((*(it - 1) + *it) / 2);
+                    hydroAvg.push_back((*(it - 1) + *it) / 2);
                     continue;
                 }
-                data.hydroAvg.push_back((*(it -1) + *it + *(it + 1))/3);
+                hydroAvg.push_back((*(it -1) + *it + *(it + 1))/3);
             }
 
-        if (data.hydroAvg.size() != data.hydroVal.size()) {
+        if (hydroAvg.size() != hydroVal.size()) {
             std::cout << "Vector lengths do not match!" << std::endl;
-            std::cout << "HydroAverage Size: " << data.hydroAvg.size() << "\n" 
-            << "HydroValue Size: " << data.hydroVal.size() << std::endl;
+            std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
+            << "HydroValue Size: " << hydroVal.size() << std::endl;
         }
     }
 
     void assignHydro (std::vector<float>& hydroAverage) {
-        for (auto value : data.hydroAvg) {
-            if (value < data.hydropathy) {
-                data.hydroCheck.push_back('0');
+        for (auto value : hydroAvg) {
+            if (value < hydropathy) {
+                hydroCheck.push_back('0');
                 } else {
-                data.hydroCheck.push_back('1');
+                hydroCheck.push_back('1');
                 }
         }
-        if (data.hydroAvg.size() != data.hydroCheck.size()) {
+        if (hydroAvg.size() != hydroCheck.size()) {
             std::cout << "Vector lengths do not match!" << std::endl;
-            std::cout << "HydroAverage Size: " << data.hydroAvg.size() << "\n" 
-            << "HydroCheck Size: " << data.hydroCheck.size() << std::endl;
+            std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
+            << "HydroCheck Size: " << hydroCheck.size() << std::endl;
         }
-        data.hydroBinary = data.hydroCheck; // Assigned for sanity checking
+        hydroBinary = hydroCheck; // Assigned for sanity checking
     }   
 
     void determineHblobs (std::string& hydroBinary) {
@@ -83,7 +77,7 @@ class Blobulator
                 ++hlength;
             }
 
-            if ((hydroBinary[i] == '0' || i == n-1) && hlength > data.length - 1) {
+            if ((hydroBinary[i] == '0' || i == n-1) && hlength > length - 1) {
                 int end = start + hlength;
                 for (int j = start; j != end; j++) {
                     hydroBinary[j] = 'h';
@@ -92,7 +86,7 @@ class Blobulator
             
             
             } 
-            if (hydroBinary[i] == '0' && hlength < data.length) {
+            if (hydroBinary[i] == '0' && hlength < length) {
                 hlength = 0;
             }
             ++i;
@@ -115,13 +109,13 @@ class Blobulator
             }           
 
             if ((hydroBinary[i] == 'h' || i == n-1) && plength > 0) {
-                if (plength > data.length - 1) {
+                if (plength > length - 1) {
                     int end = plength + start;
                     for (int j = start; j != end; j++) {
                         hydroBinary[j] = 'p';
                     }
                     plength = 0;
-                } else if (plength < data.length) {
+                } else if (plength < length) {
                     int end = plength + start;
                     for (int j = start; j != end; j++) {
                         hydroBinary[j] = 's';
@@ -134,10 +128,10 @@ class Blobulator
         
         }
 
-        if (hydroBinary.size() != data.hydroAvg.size() ) {
+        if (hydroBinary.size() != hydroAvg.size() ) {
             std::cout << "Sizes do not match!" << "\nHydro Binary Size: "
             << hydroBinary.size() << "\nHydro Average Size: "  <<
-            data.hydroAvg.size() << "\n";
+            hydroAvg.size() << "\n";
             }
     }
 };
@@ -149,22 +143,22 @@ int main() {
     Blobulator blob;
     
     std::cout << "Please Input a FASTA Sequence:";
-    std::cin >> blob.data.aminoCode;
+    std::cin >> blob.aminoCode;
     std::cout << "\nPlease Input Hydropathy Minimum:";
-    std::cin >> blob.data.hydropathy;
+    std::cin >> blob.hydropathy;
     std::cout << "\nPlease Input Length Minimum:";
-    std::cin >> blob.data.length;
+    std::cin >> blob.length;
     std::cout << "\n";
     
-    blob.acquireValues(blob.data.aminoCode);
-    blob.averageValues(blob.data.hydroVal);
-    blob.assignHydro(blob.data.hydroAvg);
-    blob.determineHblobs(blob.data.hydroBinary); 
-    blob.determinePblobs(blob.data.hydroBinary);
+    blob.acquireValues(blob.aminoCode);
+    blob.averageValues(blob.hydroVal);
+    blob.assignHydro(blob.hydroAvg);
+    blob.determineHblobs(blob.hydroBinary); 
+    blob.determinePblobs(blob.hydroBinary);
     std::cout << "Blobulated!\n" << "Comparing Sequence to Binary to Blobs\n----------------\n"
-    << "Sequence: " << blob.data.aminoCode
-    << "\n----------------\nBinary: " << blob.data.hydroCheck 
-    <<"\n----------------\nBlob Assignment: " << blob.data.hydroBinary << "\n" 
+    << "Sequence: " << blob.aminoCode
+    << "\n----------------\nBinary: " << blob.hydroCheck 
+    <<"\n----------------\nBlob Assignment: " << blob.hydroBinary << "\n" 
     <<std::endl;
     system("pause");
 }
