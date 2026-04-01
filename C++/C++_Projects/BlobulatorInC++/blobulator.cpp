@@ -19,8 +19,8 @@ class Blobulator
 {
     public:
         std::string aminoCode;
-        std::string hydroCheck; // Sanity check
         std::string hydroBinary;
+        std::string hydroCharacter;
         std::vector<float> hydroVal;
         std::vector<float> hydroAvg;
         int length;
@@ -30,6 +30,12 @@ class Blobulator
         aminoCode = aC;
         length = l;
         hydropathy = h;
+
+        acquireValues();
+        averageValues();
+        assignHydro();
+        determineHblobs(); 
+        determinePblobs();
     }
 
     void acquireValues () {
@@ -63,34 +69,34 @@ class Blobulator
     void assignHydro () {
         for (auto value : hydroAvg) {
             if (value < hydropathy) {
-                hydroCheck.push_back('0');
+                hydroBinary.push_back('0');
                 } else {
-                hydroCheck.push_back('1');
+                hydroBinary.push_back('1');
                 }
         }
-        if (hydroAvg.size() != hydroCheck.size()) {
+        if (hydroAvg.size() != hydroBinary.size()) {
             std::cout << "Vector lengths do not match!" << std::endl;
             std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
-            << "HydroCheck Size: " << hydroCheck.size() << std::endl;
+            << "hydroBinary Size: " << hydroBinary.size() << std::endl;
         }
-        hydroBinary = hydroCheck; // Assigned for sanity checking
+        hydroBinary = hydroCharacter; // Created copy for string mutation
     }   
 
     void determineHblobs () {
-        auto n = hydroBinary.size();
+        auto n = hydroCharacter.size();
         int i = 0;
         int hlength = 0;
         int plength = 0;
         int start = 0;
         while (i < n) {
-            if (hydroBinary[i] != '0' && hlength < 1) {
+            if (hydroCharacter[i] != '0' && hlength < 1) {
                 start = i;
             } 
-            if (hydroBinary[i] != '0') {
+            if (hydroCharacter[i] != '0') {
                 ++hlength;
             }
 
-            if ((hydroBinary[i] == '0' || i == n-1) && hlength > length - 1) {
+            if ((hydroCharacter[i] == '0' || i == n-1) && hlength > length - 1) {
                 int end = start + hlength;
                 for (int j = start; j != end; j++) {
                     hydroBinary[j] = 'h';
@@ -99,7 +105,7 @@ class Blobulator
             
             
             } 
-            if (hydroBinary[i] == '0' && hlength < length) {
+            if (hydroCharacter[i] == '0' && hlength < length) {
                 hlength = 0;
             }
             ++i;
@@ -108,30 +114,30 @@ class Blobulator
     }
 
     void determinePblobs () {
-        auto n = hydroBinary.size();
+        auto n = hydroCharacter.size();
         int i = 0;
         int plength = 0;
         int start = 0;
 
         while (i < n) {
-            if (hydroBinary[i] != 'h') {
+            if (hydroCharacter[i] != 'h') {
                 if (plength == 0) {
                     start = i;
                 }
                 ++plength;
             }           
 
-            if ((hydroBinary[i] == 'h' || i == n-1) && plength > 0) {
+            if ((hydroCharacter[i] == 'h' || i == n-1) && plength > 0) {
                 if (plength > length - 1) {
                     int end = plength + start;
                     for (int j = start; j != end; j++) {
-                        hydroBinary[j] = 'p';
+                        hydroCharacter[j] = 'p';
                     }
                     plength = 0;
                 } else if (plength < length) {
                     int end = plength + start;
                     for (int j = start; j != end; j++) {
-                        hydroBinary[j] = 's';
+                        hydroCharacter[j] = 's';
                     }
                     plength = 0;
                 }
@@ -141,12 +147,52 @@ class Blobulator
         
         }
 
-        if (hydroBinary.size() != hydroAvg.size() ) {
+        if (hydroCharacter.size() != hydroBinary.size() ) {
             std::cout << "Sizes do not match!" << "\nHydro Binary Size: "
             << hydroBinary.size() << "\nHydro Average Size: "  <<
             hydroAvg.size() << "\n";
             }
     }
+
+    // Helper functions 
+    
+    
+    // Counts the number of hydrophobic amino acids
+    int HBlobCount() {
+        int i = 0;
+        int hNumber = 0;
+        while (i < hydroBinary.size()) {
+            if (hydroBinary[i] == '1');
+                hNumber++;
+
+            i++;
+
+        }
+        return hNumber;
+
+    }
+
+
+
+
+    // Creating operator overloads to compare Blobulator Objects
+
+    bool operator<(Blobulator blob2) {
+        if (this->HBlobCount() < blob2.HBlobCount())
+            return true;
+        else 
+            return false;
+    }
+
+    bool operator>(Blobulator blob2) {
+        if (this-> HBlobCount() < blob2.HBlobCount())
+            return true;
+        else
+            return false;
+    }
+
+
+    // No dynamically allocated memory so no deconstructor needed
 };
 
 
@@ -166,18 +212,11 @@ int main() {
     std::cout << "\n";
 
     Blobulator blob(aminoCode, length, hydropathy);
-    
-    blob.acquireValues();
-    blob.averageValues();
-    blob.assignHydro();
-    blob.determineHblobs(); 
-    blob.determinePblobs();
     std::cout << "Blobulated!\n" 
     << "Comparing Sequence to Binary to Blobs\n----------------\n"
     << "Sequence: " << blob.aminoCode 
-    << "\n----------------\nBinary: " << blob.hydroCheck 
+    << "\n----------------\nBinary: " << blob.hydroBinary 
     <<"\n----------------\nBlob Assignment: " 
-    << blob.hydroBinary << "\n" 
-    <<std::endl;
+    << blob.hydroCharacter << "\n\n";
     system("pause");
 }
