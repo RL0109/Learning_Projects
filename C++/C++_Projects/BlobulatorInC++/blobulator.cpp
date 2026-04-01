@@ -79,7 +79,7 @@ class Blobulator
             std::cout << "HydroAverage Size: " << hydroAvg.size() << "\n" 
             << "hydroBinary Size: " << hydroBinary.size() << std::endl;
         }
-        hydroBinary = hydroCharacter; // Created copy for string mutation
+        hydroCharacter = hydroBinary; // Created copy for string mutation
     }   
 
     void determineHblobs () {
@@ -99,7 +99,7 @@ class Blobulator
             if ((hydroCharacter[i] == '0' || i == n-1) && hlength > length - 1) {
                 int end = start + hlength;
                 for (int j = start; j != end; j++) {
-                    hydroBinary[j] = 'h';
+                    hydroCharacter[j] = 'h';
                 }
                 hlength = 0;
             
