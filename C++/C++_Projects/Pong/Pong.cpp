@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 
     float yOffset = 5.0f;
 
-    for (int i = 0; i < totalLines * stride; i += 4) {
+    for (int i = 0; i < totalLines * stride; i += stride) {
         lines[i] = SCREEN_WIDTH/2;
         lines[i + 1] = yOffset;
         lines[i + 2] = 5;
@@ -40,9 +40,11 @@ int main(int argc, char* argv[]) {
     float ballVY = BALL_SPEED;
 
     SDL_Event event;
+
+    // Need loop to finish before exiting.
     bool running = true;
-    bool ballBounced = false;
-    bool inBounds = true;
+
+    // Gets the time in order to get deltaTime in loop.
     Uint64 lastTime = SDL_GetTicks();
 
     while (running) {
@@ -86,19 +88,19 @@ int main(int argc, char* argv[]) {
             ball.x += ballVX * dt;
         }
 
-        if (ball.y > SCREEN_HEIGHT || ball.y < 0) {
-            if (inBounds) {
-                ballVY = -ballVY;
-                inBounds = false;
-            }
-        } else {
-            inBounds = true;
+        if (ball.y > SCREEN_HEIGHT - 5.0f) {
+            ball.y = SCREEN_HEIGHT - 5.0f - 0.1f;
+            ballVY = -ballVY;
+        } 
+        if (ball.y < 0) {
+            ball.y = 0 + 0.1f;
+            ballVY  = -ballVY;
         }
 
         if (ball.x > SCREEN_WIDTH || ball.x < 0) {
             
-            ball.x = SCREEN_HEIGHT*0.5;
-            ball.y = SCREEN_WIDTH*0.5;
+            ball.x = SCREEN_WIDTH*0.5;
+            ball.y = SCREEN_HEIGHT*0.5;
             roundDelayTimer = 2.0f;
         }
 
@@ -145,7 +147,7 @@ int main(int argc, char* argv[]) {
 
         for (int i = 0; i < totalLines * stride; i += 4) {
             SDL_FRect line = {lines[i], lines[i+1],lines[i+2],lines[i+3]};
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 200);
             SDL_RenderFillRect(renderer, &line);
         }
 
