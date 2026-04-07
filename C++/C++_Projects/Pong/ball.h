@@ -3,22 +3,25 @@
 class Ball {
 
     public: 
-    float xLoc, yLoc, width, height, screen_width, screen_height;
-    bool isPlayer1;
-    SDL_FRect ball;
+    float width, height, speed, ballVx, ballVy;
+    SDL_FRect ballPos;
 
-    Ball(float x, float y, const float w, const float h, float sw, float sh)
-        : screen_width(sw) , screen_height(sh)
+    Ball(float x, float y, float w, float h, float s)
      {
-        ball = SDL_FRect{x, y, w, h};
-        xLoc = x;
-        yLoc = y;
+        ballPos = SDL_FRect{x, y, w, h};
         width = w;
         height = h;
-
+        speed = s;
+    }
+    
+    void setSpeed() {
+        ballVx = speed;
+        ballVy = speed;
     }
 
 
 
 
-}
+
+
+};
