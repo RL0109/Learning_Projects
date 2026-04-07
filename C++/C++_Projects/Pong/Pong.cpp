@@ -1,8 +1,11 @@
 #include <iostream>
+#include "paddle.h"
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 #include <cmath>
-#include <paddle.h>
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 
 const int SCREEN_WIDTH = 800;
@@ -22,8 +25,8 @@ int main(int argc, char* argv[]) {
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 
-    SDL_FRect player1 = {5.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
-    SDL_FRect player2 = {785.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
+    Paddle player1(5.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT, true);
+    Paddle player2 = {785.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false};
     SDL_FRect ball = { 350.0f, 250.0f, 10.0f, 10.0f };
 
     float roundDelayTimer = 2.0f;
@@ -74,21 +77,25 @@ int main(int argc, char* argv[]) {
             roundDelayTimer -= dt;
         }
 
-        if (keys[SDL_SCANCODE_W] && player1.y > 0) {
-            player1.y -= PADDLE_SPEED *dt;
-        }
 
-        if (keys[SDL_SCANCODE_S]&& player1.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
-            player1.y += PADDLE_SPEED *dt;
-        }
+        player1.movePadde(PADDLE_SPEED, dt, keys);
+        player2.movePadde(PADDLE_SPEED, dt, keys);
 
-        if (keys[SDL_SCANCODE_UP] && player2.y > 0) {
-            player2.y -= PADDLE_SPEED *dt;
-        }
+        // if (keys[SDL_SCANCODE_W] && player1.y > 0) {
+        //     player1.y -= PADDLE_SPEED *dt;
+        // }
 
-        if (keys[SDL_SCANCODE_DOWN]&& player2.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
-            player2.y += PADDLE_SPEED *dt;
-        }
+        // if (keys[SDL_SCANCODE_S]&& player1.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
+        //     player1.y += PADDLE_SPEED *dt;
+        // }
+
+        // if (keys[SDL_SCANCODE_UP] && player2.y > 0) {
+        //     player2.y -= PADDLE_SPEED *dt;
+        // }
+
+        // if (keys[SDL_SCANCODE_DOWN]&& player2.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
+        //     player2.y += PADDLE_SPEED *dt;
+        // }
 
         if (roundDelayTimer <= 0) {
             ball.y += ballVY * dt;
@@ -111,21 +118,21 @@ int main(int argc, char* argv[]) {
             roundDelayTimer = 2.0f;
         }
 
-        if (ball.x > player1.x && ball.x < player1.x + PADDLE_WIDTH) {
-            if (ball.y > player1.y && ball.y < player1.y + PADDLE_HEIGHT)
+        if (ball.x > player1.xLoc && ball.x < player1.xLoc + player1.width) {
+            if (ball.y > player1.yLoc && ball.y < player1.yLoc + player1.height)
                 {
-                    float intersect = ball.y + (ball.h /2) - player1.y + (player1.h /2); 
-                    float relIntersect = intersect / player1.h/2;
-                    float bounceAngle = relIntersect * (std::M_PI *4)
-                    ball.x = player1.x + player1.w + 1.0f;
+                    float intersect = ball.y + (ball.h /2) - player1.yLoc + (player1.height /2); 
+                    float relIntersect = intersect / player1.height/2;
+                    float bounceAngle = relIntersect * (M_PI *4);
+                    ball.x = player1.xLoc + player1.width + 1.0f;
                     ballVX = -ballVX;
                 }
                 
         } 
 
-        if (ball.x < player2.x && ball.x > player2.x - PADDLE_WIDTH) {
-            if (ball.y > player2.y && ball.y < player2.y + PADDLE_HEIGHT)
-                ball.x = player2.x - player2.w - 1.0f;
+        if (ball.x < player2.xLoc && ball.x > player2.xLoc - PADDLE_WIDTH) {
+            if (ball.y > player2.yLoc && ball.y < player2.yLoc + PADDLE_HEIGHT)
+                ball.x = player2.xLoc - player2.width - 1.0f;
                 ballVX = -ballVX;
                 
         } 
@@ -135,11 +142,11 @@ int main(int argc, char* argv[]) {
         SDL_RenderClear(renderer);
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &player1);
+        SDL_RenderFillRect(renderer, &player1.player);
 
         
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &player2);
+        SDL_RenderFillRect(renderer, &player2.player);
 
 
 

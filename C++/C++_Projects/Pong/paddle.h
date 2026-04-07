@@ -4,16 +4,17 @@
 class Paddle {
     public: 
     float xLoc, yLoc, width, height, screen_width, screen_height;
-    bool playerDirection;
+    bool isPlayer1;
     SDL_FRect player;
 
-    Paddle(float x, float y, const float w, const float h) {
+    Paddle(float x, float y, const float w, const float h, float sw, float sh, bool p1)
+        : screen_width(sw) , screen_height(sh), isPlayer1(p1)
+     {
         player = SDL_FRect{x, y, w, h};
         xLoc = x;
         yLoc = y;
         width = w;
         height = h;
-        //playerDirection = playerSide;
 
     }
 
@@ -27,7 +28,7 @@ class Paddle {
     }
 
     void movePadde(float paddleSpeed, float dt, const bool* keys) {
-        if (true) {
+        if (isPlayer1) {
             if (keys[SDL_SCANCODE_W] && player.y > 0) {
             player.y -= paddleSpeed *dt;
         }
