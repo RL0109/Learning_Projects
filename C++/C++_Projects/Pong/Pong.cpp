@@ -1,6 +1,4 @@
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
 
@@ -111,7 +109,7 @@ int main(int argc, char* argv[]) {
                 ballVX = -ballVX;
         }
 
-        if (ball.x > player2.x && ball.x < player2.x + PADDLE_WIDTH) {
+        if (ball.x < player2.x && ball.x > player2.x - PADDLE_WIDTH) {
             if (ball.y > player2.y && ball.y < player2.y + PADDLE_HEIGHT)
                 ballVX = -ballVX;
         }
