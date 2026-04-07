@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
     SDL_FRect player2 = {785.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT};
     SDL_FRect ball = { 350.0f, 250.0f, 10.0f, 10.0f };
 
+    float roundDelayTimer = 2.0f;
+
+
     // stride is the amount of data per line object stored in the array
     int const stride = 4;
     int const totalLines = 30;
@@ -56,6 +59,7 @@ int main(int argc, char* argv[]) {
 
     while (running) {
         
+
         Uint64 now = SDL_GetTicks();
         float dt = (now - lastTime) / 1000.0f;
         lastTime = now;
@@ -66,6 +70,10 @@ int main(int argc, char* argv[]) {
 
         const bool* keys = SDL_GetKeyboardState(NULL);
 
+        if (roundDelayTimer > 0) {
+            roundDelayTimer -= dt;
+        }
+
         if (keys[SDL_SCANCODE_W] && player1.y > 0) {
             player1.y -= PADDLE_SPEED *dt;
         }
@@ -74,17 +82,36 @@ int main(int argc, char* argv[]) {
             player1.y += PADDLE_SPEED *dt;
         }
 
-        ball.y += ballVY * dt;
-        ball.x += ballVX * dt;
+        if (keys[SDL_SCANCODE_UP] && player2.y > 0) {
+            player2.y -= PADDLE_SPEED *dt;
+        }
+
+        if (keys[SDL_SCANCODE_DOWN]&& player2.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
+            player2.y += PADDLE_SPEED *dt;
+        }
+
+        if (roundDelayTimer <= 0) {
+            ball.y += ballVY * dt;
+            ball.x += ballVX * dt;
+        }
 
         if (ball.y > SCREEN_HEIGHT || ball.y < 0) {
             ballVY = -ballVY;
         }
 
         if (ball.x > SCREEN_WIDTH || ball.x < 0) {
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-            ball.x = 0;
-            ball.y = 0;
+            
+            ball.x = SCREEN_HEIGHT*0.5;
+            ball.y = SCREEN_WIDTH*0.5;
+            roundDelayTimer = 2.0f;
+        }
+
+        if (ball.x == player1.x && ball.y == player1.y) {
+            ballVX = -ballVX;
+        }
+
+        if (ball.x == player2.x && ball.y == player2.y) {
+            ballVX = -ballVX;
         }
 
         // Draw a dark grey background
