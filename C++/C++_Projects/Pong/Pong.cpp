@@ -1,22 +1,4 @@
-#include <iostream>
-#include "paddle.h"
-#include <SDL3/SDL.h>
-#include <SDL3/SDL_main.h>
-#include <cmath>
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
-
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-const float PADDLE_SPEED = 300.0f;
-const float BALL_SPEED = 250.0f; 
-
-const float PADDLE_HEIGHT = 100.0f;
-const float PADDLE_WIDTH = 10.0f;
-
-
+#include "master.h"
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -125,7 +107,7 @@ int main(int argc, char* argv[]) {
                     float relIntersect = intersect / player1.height/2;
                     float bounceAngle = relIntersect * (M_PI *4);
                     ball.x = player1.xLoc + player1.width + 1.0f;
-                    ballVX = -ballVX;
+                    ballVX = -ballVX * cos(bounceAngle);
                 }
                 
         } 
