@@ -5,12 +5,12 @@
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window = SDL_CreateWindow("PONG", 800, 600, 0);
+    SDL_Window* window = SDL_CreateWindow("PONG", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 
     Paddle player1(5.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT, true);
-    Paddle player2 = {785.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false};
+    Paddle player2 = {SCREEN_WIDTH- 15.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false};
     SDL_FRect ball = { 350.0f, 250.0f, 10.0f, 10.0f };
 
     float roundDelayTimer = 2.0f;
@@ -105,9 +105,9 @@ int main(int argc, char* argv[]) {
         if (ball.x > player1.player.x && ball.x < player1.player.x + player1.width) {
             if (ball.y > player1.player.y && ball.y < player1.player.y + player1.height)
                 {
-                    float intersect = ball.y + (ball.h /2) - player1.player.y + (player1.height /2); 
-                    float relIntersect = intersect / player1.height/2;
-                    float bounceAngle = relIntersect * (M_PI /4);
+                    float intersect = (ball.y + (ball.h /2)) - (player1.player.y + (player1.height /2.0f)); 
+                    float relIntersect = intersect / (player1.height/2.0f);
+                    float bounceAngle = relIntersect * (M_PI /4.0f);
                     ball.x = player1.player.x + player1.width + 1.0f;
                     ballVX = BALL_SPEED * cos(bounceAngle);
                     ballVY = BALL_SPEED * sin(bounceAngle);
@@ -116,11 +116,15 @@ int main(int argc, char* argv[]) {
                 
         } 
 
-        if (ball.x < player2.player.x && ball.x > player2.player.x - PADDLE_WIDTH) {
-            if (ball.y > player2.player.y && ball.y < player2.player.y + PADDLE_HEIGHT)
+        if (ball.x < player2.player.x && ball.x > player2.player.x - player2.width) {
+            if (ball.y > player2.player.y && ball.y < player2.player.y + player2.height) {
+                float intersect = (ball.y + (ball.h /2.0f)) - (player2.player.y + (player2.height /2.0f)); 
+                float relIntersect = intersect / (player2.height/2.0f);
+                float bounceAngle = relIntersect * (M_PI /4.0f);
                 ball.x = player2.player.x - player2.width - 1.0f;
-                ballVX = -ballVX;
-                
+                ballVX = -BALL_SPEED * cos(bounceAngle);
+                ballVY = BALL_SPEED * sin(bounceAngle);
+            }
         } 
 
         // Draw a dark grey background
