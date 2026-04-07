@@ -1,6 +1,8 @@
 #include <iostream>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_main.h>
+#include <cmath>
+#include <paddle.h>
 
 
 const int SCREEN_WIDTH = 800;
@@ -16,7 +18,7 @@ const float PADDLE_WIDTH = 10.0f;
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window = SDL_CreateWindow("Hello SDL2", 800, 600, 0);
+    SDL_Window* window = SDL_CreateWindow("PONG", 800, 600, 0);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 
@@ -52,11 +54,11 @@ int main(int argc, char* argv[]) {
 
     SDL_Event event;
     bool running = true;
-
+    bool ballBounced = false;
+    bool inBounds = true;
     Uint64 lastTime = SDL_GetTicks();
 
     while (running) {
-        
 
         Uint64 now = SDL_GetTicks();
         float dt = (now - lastTime) / 1000.0f;
@@ -94,7 +96,12 @@ int main(int argc, char* argv[]) {
         }
 
         if (ball.y > SCREEN_HEIGHT || ball.y < 0) {
-            ballVY = -ballVY;
+            if (inBounds) {
+                ballVY = -ballVY;
+                inBounds = false;
+            }
+        } else {
+            inBounds = true;
         }
 
         if (ball.x > SCREEN_WIDTH || ball.x < 0) {
@@ -106,13 +113,22 @@ int main(int argc, char* argv[]) {
 
         if (ball.x > player1.x && ball.x < player1.x + PADDLE_WIDTH) {
             if (ball.y > player1.y && ball.y < player1.y + PADDLE_HEIGHT)
-                ballVX = -ballVX;
-        }
+                {
+                    float intersect = ball.y + (ball.h /2) - player1.y + (player1.h /2); 
+                    float relIntersect = intersect / player1.h/2;
+                    float bounceAngle = relIntersect * (std::M_PI *4)
+                    ball.x = player1.x + player1.w + 1.0f;
+                    ballVX = -ballVX;
+                }
+                
+        } 
 
         if (ball.x < player2.x && ball.x > player2.x - PADDLE_WIDTH) {
             if (ball.y > player2.y && ball.y < player2.y + PADDLE_HEIGHT)
+                ball.x = player2.x - player2.w - 1.0f;
                 ballVX = -ballVX;
-        }
+                
+        } 
 
         // Draw a dark grey background
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -126,14 +142,14 @@ int main(int argc, char* argv[]) {
         SDL_RenderFillRect(renderer, &player2);
 
 
-        // Draw a white rectangle in the center
+
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &ball);
 
         for (int i = 0; i < totalLines * stride; i += 4) {
-        SDL_FRect line = {lines[i], lines[i+1],lines[i+2],lines[i+3]};
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &line);
+            SDL_FRect line = {lines[i], lines[i+1],lines[i+2],lines[i+3]};
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+            SDL_RenderFillRect(renderer, &line);
         }
 
         SDL_RenderPresent(renderer);
