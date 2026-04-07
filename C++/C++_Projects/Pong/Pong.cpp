@@ -1,4 +1,6 @@
 #include "master.h"
+#include "paddle.h"
+#include "ball.h"
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -100,21 +102,23 @@ int main(int argc, char* argv[]) {
             roundDelayTimer = 2.0f;
         }
 
-        if (ball.x > player1.xLoc && ball.x < player1.xLoc + player1.width) {
-            if (ball.y > player1.yLoc && ball.y < player1.yLoc + player1.height)
+        if (ball.x > player1.player.x && ball.x < player1.player.x + player1.width) {
+            if (ball.y > player1.player.y && ball.y < player1.player.y + player1.height)
                 {
-                    float intersect = ball.y + (ball.h /2) - player1.yLoc + (player1.height /2); 
+                    float intersect = ball.y + (ball.h /2) - player1.player.y + (player1.height /2); 
                     float relIntersect = intersect / player1.height/2;
-                    float bounceAngle = relIntersect * (M_PI *4);
-                    ball.x = player1.xLoc + player1.width + 1.0f;
-                    ballVX = -ballVX * cos(bounceAngle);
+                    float bounceAngle = relIntersect * (M_PI /4);
+                    ball.x = player1.player.x + player1.width + 1.0f;
+                    ballVX = BALL_SPEED * cos(bounceAngle);
+                    ballVY = BALL_SPEED * sin(bounceAngle);
+                    
                 }
                 
         } 
 
-        if (ball.x < player2.xLoc && ball.x > player2.xLoc - PADDLE_WIDTH) {
-            if (ball.y > player2.yLoc && ball.y < player2.yLoc + PADDLE_HEIGHT)
-                ball.x = player2.xLoc - player2.width - 1.0f;
+        if (ball.x < player2.player.x && ball.x > player2.player.x - PADDLE_WIDTH) {
+            if (ball.y > player2.player.y && ball.y < player2.player.y + PADDLE_HEIGHT)
+                ball.x = player2.player.x - player2.width - 1.0f;
                 ballVX = -ballVX;
                 
         } 

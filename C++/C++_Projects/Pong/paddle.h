@@ -2,7 +2,7 @@
 
 class Paddle {
     public: 
-    float xLoc, yLoc, width, height, screen_width, screen_height;
+    float width, height, screen_width, screen_height;
     bool isPlayer1;
     SDL_FRect player;
 
@@ -10,15 +10,13 @@ class Paddle {
         : screen_width(sw) , screen_height(sh), isPlayer1(p1)
      {
         player = SDL_FRect{x, y, w, h};
-        xLoc = x;
-        yLoc = y;
         width = w;
         height = h;
 
     }
 
     float getCenter() {
-        return yLoc + (height / 2.0f);
+        return player.y + (height / 2.0f);
     }
 
     void getScreenDimensions(float sw, float sh) {
