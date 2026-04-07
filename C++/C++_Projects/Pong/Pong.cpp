@@ -10,8 +10,8 @@ int main(int argc, char* argv[]) {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 
     Paddle player1(5.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT, true);
-    Paddle player2 = {SCREEN_WIDTH- 15.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false};
-    SDL_FRect ball = { 350.0f, 250.0f, 10.0f, 10.0f };
+    Paddle player2(SCREEN_WIDTH- 15.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false);
+    Ball ball( 350.0f, 250.0f, 10.0f, 10.0f, BALL_SPEED);
 
     float roundDelayTimer = 2.0f;
 
@@ -32,12 +32,6 @@ int main(int argc, char* argv[]) {
         lines[i + 3] = 5;
         yOffset += SCREEN_HEIGHT/totalLines;
     }
-
-
-
-
-    float ballVX = BALL_SPEED;
-    float ballVY = BALL_SPEED;
 
     SDL_Event event;
 
@@ -67,65 +61,45 @@ int main(int argc, char* argv[]) {
         player1.movePadde(PADDLE_SPEED, dt, keys);
         player2.movePadde(PADDLE_SPEED, dt, keys);
 
-        // if (keys[SDL_SCANCODE_W] && player1.y > 0) {
-        //     player1.y -= PADDLE_SPEED *dt;
-        // }
-
-        // if (keys[SDL_SCANCODE_S]&& player1.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
-        //     player1.y += PADDLE_SPEED *dt;
-        // }
-
-        // if (keys[SDL_SCANCODE_UP] && player2.y > 0) {
-        //     player2.y -= PADDLE_SPEED *dt;
-        // }
-
-        // if (keys[SDL_SCANCODE_DOWN]&& player2.y < SCREEN_HEIGHT - PADDLE_HEIGHT) {
-        //     player2.y += PADDLE_SPEED *dt;
-        // }
-
         if (roundDelayTimer <= 0) {
-            ball.y += ballVY * dt;
-            ball.x += ballVX * dt;
+            ball.moveBall(dt);
         }
 
-        if (ball.y > SCREEN_HEIGHT - 5.0f) {
-            ball.y = SCREEN_HEIGHT - 5.0f - 0.1f;
-            ballVY = -ballVY;
+        if (ball.ballPos.y > SCREEN_HEIGHT - 5.0f) {
+            ball.ballPos.y = SCREEN_HEIGHT - 5.0f - 0.1f;
+            ball.ballVy = -ball.ballVy;
         } 
-        if (ball.y < 0) {
-            ball.y = 0 + 0.1f;
-            ballVY  = -ballVY;
+        if (ball.ballPos.y < 0) {
+            ball.ballPos.y = 0 + 0.1f;
+            ball.ballVy  = -ball.ballVy;
         }
 
-        if (ball.x > SCREEN_WIDTH || ball.x < 0) {
-            
-            ball.x = SCREEN_WIDTH*0.5;
-            ball.y = SCREEN_HEIGHT*0.5;
+        if (ball.ballPos.x > SCREEN_WIDTH || ball.ballPos.x < 0) {
+            ball.ballPos.x = SCREEN_WIDTH*0.5;
+            ball.ballPos.y = SCREEN_HEIGHT*0.5;
             roundDelayTimer = 2.0f;
         }
 
-        if (ball.x > player1.player.x && ball.x < player1.player.x + player1.width) {
-            if (ball.y > player1.player.y && ball.y < player1.player.y + player1.height)
+        if (ball.ballPos.x > player1.player.x && ball.ballPos.x < player1.player.x + player1.width) {
+            if (ball.ballPos.y > player1.player.y && ball.ballPos.y < player1.player.y + player1.height)
                 {
-                    float intersect = (ball.y + (ball.h /2)) - (player1.player.y + (player1.height /2.0f)); 
+                    float intersect = (ball.ballPos.y + (ball.height /2)) - (player1.player.y + (player1.height /2.0f)); 
                     float relIntersect = intersect / (player1.height/2.0f);
                     float bounceAngle = relIntersect * (M_PI /4.0f);
-                    ball.x = player1.player.x + player1.width + 1.0f;
-                    ballVX = BALL_SPEED * cos(bounceAngle);
-                    ballVY = BALL_SPEED * sin(bounceAngle);
-                    
+                    ball.ballPos.x = player1.player.x + player1.width + 1.0f;
+                    ball.deflectBall(bounceAngle, true);
                 }
                 
         } 
 
-        if (ball.x < player2.player.x && ball.x > player2.player.x - player2.width) {
-            if (ball.y > player2.player.y && ball.y < player2.player.y + player2.height) {
-                float intersect = (ball.y + (ball.h /2.0f)) - (player2.player.y + (player2.height /2.0f)); 
+        if (ball.ballPos.x < player2.player.x && ball.ballPos.x > player2.player.x - player2.width) {
+            if (ball.ballPos.y > player2.player.y && ball.ballPos.y < player2.player.y + player2.height) 
+            {
+                float intersect = (ball.ballPos.y + (ball.height /2.0f)) - (player2.player.y + (player2.height /2.0f)); 
                 float relIntersect = intersect / (player2.height/2.0f);
                 float bounceAngle = relIntersect * (M_PI /4.0f);
-                ball.x = player2.player.x - player2.width - 1.0f;
-                ballVX = -BALL_SPEED * cos(bounceAngle);
-                ballVY = BALL_SPEED * sin(bounceAngle);
+                ball.ballPos.x = player2.player.x - player2.width - 1.0f;
+                ball.deflectBall(bounceAngle, false);
             }
         } 
 
@@ -140,14 +114,12 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &player2.player);
 
-
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-        SDL_RenderFillRect(renderer, &ball);
+        SDL_RenderFillRect(renderer, &ball.ballPos);
 
         for (int i = 0; i < totalLines * stride; i += 4) {
             SDL_FRect line = {lines[i], lines[i+1],lines[i+2],lines[i+3]};
-            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 200);
+            SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
             SDL_RenderFillRect(renderer, &line);
         }
 
