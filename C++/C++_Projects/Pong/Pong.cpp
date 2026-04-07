@@ -106,12 +106,14 @@ int main(int argc, char* argv[]) {
             roundDelayTimer = 2.0f;
         }
 
-        if (ball.x == player1.x && ball.y == player1.y) {
-            ballVX = -ballVX;
+        if (ball.x > player1.x && ball.x < player1.x + PADDLE_WIDTH) {
+            if (ball.y > player1.y && ball.y < player1.y + PADDLE_HEIGHT)
+                ballVX = -ballVX;
         }
 
-        if (ball.x == player2.x && ball.y == player2.y) {
-            ballVX = -ballVX;
+        if (ball.x > player2.x && ball.x < player2.x + PADDLE_WIDTH) {
+            if (ball.y > player2.y && ball.y < player2.y + PADDLE_HEIGHT)
+                ballVX = -ballVX;
         }
 
         // Draw a dark grey background
