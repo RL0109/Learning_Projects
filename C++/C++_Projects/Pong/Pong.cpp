@@ -2,6 +2,8 @@
 #include "paddle.h"
 #include "ball.h"
 
+
+
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
 
@@ -23,14 +25,17 @@ int main(int argc, char* argv[]) {
     // lines is the array holding the info of the each line
     float lines[totalLines * stride];
 
-    float yOffset = 5.0f;
+    SDL_FRect dashLines[totalLines];
 
-    for (int i = 0; i < totalLines * stride; i += stride) {
-        lines[i] = SCREEN_WIDTH/2;
-        lines[i + 1] = yOffset;
-        lines[i + 2] = 5;
-        lines[i + 3] = 5;
-        yOffset += SCREEN_HEIGHT/totalLines;
+    float yOffset = 5.0f;
+    float gap = SCREEN_HEIGHT/(float)totalLines;
+
+    for (int i = 0; i < totalLines; i ++) {
+        dashLines[i].x = SCREEN_WIDTH/2;
+        dashLines[i].y = yOffset;
+        dashLines[i].w = 5;
+        dashLines[i].h = 5;
+        yOffset += gap;
     }
 
     SDL_Event event;
@@ -41,11 +46,27 @@ int main(int argc, char* argv[]) {
     // Gets the time in order to get deltaTime in loop.
     Uint64 lastTime = SDL_GetTicks();
 
+    //Get frame rate
+    float fpsTimer = 0.0f;
+    int frameCount = 0;
+    bool fpsCheck = false;
+
     while (running) {
 
         Uint64 now = SDL_GetTicks();
         float dt = (now - lastTime) / 1000.0f;
         lastTime = now;
+
+        fpsTimer += dt;
+        frameCount++;
+
+        if (fpsTimer >= 1.0f) {
+            if (fpsCheck) {
+                std::cout << "FPS: " << frameCount << std::endl;
+                fpsTimer = 0.0f;
+                frameCount = 0;
+            }
+        }
 
         while (SDL_PollEvent(&event)) 
             if (event.type == SDL_EVENT_QUIT)
@@ -117,10 +138,10 @@ int main(int argc, char* argv[]) {
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &ball.ballPos);
 
-        for (int i = 0; i < totalLines * stride; i += 4) {
-            SDL_FRect line = {lines[i], lines[i+1],lines[i+2],lines[i+3]};
+        for (int i = 0; i < totalLines; i ++) {
+            
             SDL_SetRenderDrawColor(renderer, 200, 200, 200, 255);
-            SDL_RenderFillRect(renderer, &line);
+            SDL_RenderFillRect(renderer, &dashLines[i]);
         }
 
         SDL_RenderPresent(renderer);
@@ -132,4 +153,8 @@ int main(int argc, char* argv[]) {
     SDL_Quit();
     return 0;
 
+}
+
+void countFPS() {
+    
 }
