@@ -2,17 +2,24 @@
 #include "paddle.h"
 #include "ball.h"
 
+#include <SDL3_ttf/SDL_ttf.h>
 
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
+    TTF_Font* font = TTF_OpenFont("build/ARIAL.TTF", 64);
+    if(!font) {
+        std::cout << "Failed to load font: " << SDL_GetError() << std::endl;
+        return -1;
+    }
 
     SDL_Window* window = SDL_CreateWindow("PONG", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
     SDL_Renderer* renderer = SDL_CreateRenderer(window, NULL);
 
     Paddle player1(5.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT,SCREEN_WIDTH,SCREEN_HEIGHT, true);
-    Paddle player2(SCREEN_WIDTH- 15.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false);
+    Paddle player2(SCREEN_WIDTH - 15.0f, 300.0f, PADDLE_WIDTH, PADDLE_HEIGHT, SCREEN_WIDTH , SCREEN_HEIGHT, false);
     Ball ball( 350.0f, 250.0f, 10.0f, 10.0f, BALL_SPEED);
 
     float roundDelayTimer = 2.0f;
@@ -51,7 +58,19 @@ int main(int argc, char* argv[]) {
     int frameCount = 0;
     bool fpsCheck = false;
 
+    int player1Score = 0;
+    int player2Score = 0;
+
     while (running) {
+
+        std::string scoreText = std::to_string(player1Score) + "        " + std::to_string(player2Score);
+        SDL_Color white = {255, 255, 255, 255};
+
+
+
+        
+
+        
 
         Uint64 now = SDL_GetTicks();
         float dt = (now - lastTime) / 1000.0f;
@@ -99,6 +118,11 @@ int main(int argc, char* argv[]) {
             ball.ballPos.x = SCREEN_WIDTH*0.5;
             ball.ballPos.y = SCREEN_HEIGHT*0.5;
             roundDelayTimer = 2.0f;
+            if (ball.ballPos.x < 0) {
+                player2Score++;
+            } else {
+                player1Score++;
+            }
         }
 
         if (ball.ballPos.x > player1.player.x && ball.ballPos.x < player1.player.x + player1.width) {
@@ -115,18 +139,24 @@ int main(int argc, char* argv[]) {
 
         if (ball.ballPos.x < player2.player.x && ball.ballPos.x > player2.player.x - player2.width) {
             if (ball.ballPos.y > player2.player.y && ball.ballPos.y < player2.player.y + player2.height) 
-            {
-                float intersect = (ball.ballPos.y + (ball.height /2.0f)) - (player2.player.y + (player2.height /2.0f)); 
-                float relIntersect = intersect / (player2.height/2.0f);
-                float bounceAngle = relIntersect * (M_PI /4.0f);
-                ball.ballPos.x = player2.player.x - player2.width - 1.0f;
-                ball.deflectBall(bounceAngle, false);
-            }
+                {
+                    float intersect = (ball.ballPos.y + (ball.height /2.0f)) - (player2.player.y + (player2.height /2.0f)); 
+                    float relIntersect = intersect / (player2.height/2.0f);
+                    float bounceAngle = relIntersect * (M_PI /4.0f);
+                    ball.ballPos.x = player2.player.x - player2.width - 1.0f;
+                    ball.deflectBall(bounceAngle, false);
+                }
         } 
 
         // Draw a dark grey background
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
+
+        SDL_Surface* textSurface = TTF_RenderText_Solid(font, scoreText.c_str(), 0, white);
+        SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
+        SDL_FRect scoreRect = { (SCREEN_WIDTH / 2.0F) - 100.0f, 20.0F, (float)textSurface->w, (float)textSurface->h};
+        SDL_RenderTexture(renderer, textTexture, NULL, &scoreRect);
+ 
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &player1.player);
@@ -145,6 +175,8 @@ int main(int argc, char* argv[]) {
         }
 
         SDL_RenderPresent(renderer);
+        SDL_DestroySurface(textSurface);
+        SDL_DestroyTexture(textTexture);
 
     }
 
