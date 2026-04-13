@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 
 class functionClass {
 
@@ -24,5 +25,7 @@ int main() {
 
     fc();
 
+    std::thread my_thread(fc);
+    my_thread.join();
 
 }
