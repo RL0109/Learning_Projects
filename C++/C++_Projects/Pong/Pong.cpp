@@ -4,7 +4,7 @@
 
 #include <SDL3_ttf/SDL_ttf.h>
 
-void RespawnBall(Ball& ball, float timer) {
+void RespawnBall(Ball& ball, float& timer) {
     ball.ballPos.x = SCREEN_WIDTH*0.5;
     ball.ballPos.y = SCREEN_HEIGHT*0.5;
     timer = 2.0f;
