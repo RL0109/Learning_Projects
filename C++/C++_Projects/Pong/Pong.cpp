@@ -66,12 +66,6 @@ int main(int argc, char* argv[]) {
         std::string scoreText = std::to_string(player1Score) + "        " + std::to_string(player2Score);
         SDL_Color white = {255, 255, 255, 255};
 
-
-
-        
-
-        
-
         Uint64 now = SDL_GetTicks();
         float dt = (now - lastTime) / 1000.0f;
         lastTime = now;
@@ -97,7 +91,6 @@ int main(int argc, char* argv[]) {
             roundDelayTimer -= dt;
         }
 
-
         player1.movePadde(PADDLE_SPEED, dt, keys);
         player2.movePadde(PADDLE_SPEED, dt, keys);
 
@@ -114,15 +107,18 @@ int main(int argc, char* argv[]) {
             ball.ballVy  = -ball.ballVy;
         }
 
-        if (ball.ballPos.x > SCREEN_WIDTH || ball.ballPos.x < 0) {
+        if (ball.ballPos.x > SCREEN_WIDTH) {
             ball.ballPos.x = SCREEN_WIDTH*0.5;
             ball.ballPos.y = SCREEN_HEIGHT*0.5;
             roundDelayTimer = 2.0f;
-            if (ball.ballPos.x < 0) {
-                player2Score++;
-            } else {
-                player1Score++;
-            }
+            player1Score++;
+        }
+
+        if  (ball.ballPos.x < 0) {
+            ball.ballPos.x = SCREEN_WIDTH*0.5;
+            ball.ballPos.y = SCREEN_HEIGHT*0.5;
+            roundDelayTimer = 2.0f;
+            player2Score++;
         }
 
         if (ball.ballPos.x > player1.player.x && ball.ballPos.x < player1.player.x + player1.width) {
@@ -133,8 +129,7 @@ int main(int argc, char* argv[]) {
                     float bounceAngle = relIntersect * (M_PI /4.0f);
                     ball.ballPos.x = player1.player.x + player1.width + 1.0f;
                     ball.deflectBall(bounceAngle, true);
-                }
-                
+                }    
         } 
 
         if (ball.ballPos.x < player2.player.x && ball.ballPos.x > player2.player.x - player2.width) {
@@ -156,12 +151,10 @@ int main(int argc, char* argv[]) {
         SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
         SDL_FRect scoreRect = { (SCREEN_WIDTH / 2.0F) - 100.0f, 20.0F, (float)textSurface->w, (float)textSurface->h};
         SDL_RenderTexture(renderer, textTexture, NULL, &scoreRect);
- 
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &player1.player);
 
-        
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &player2.player);
 
