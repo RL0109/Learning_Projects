@@ -4,6 +4,11 @@
 
 #include <SDL3_ttf/SDL_ttf.h>
 
+void RespawnBall(Ball& ball, float timer) {
+    ball.ballPos.x = SCREEN_WIDTH*0.5;
+    ball.ballPos.y = SCREEN_HEIGHT*0.5;
+    timer = 2.0f;
+}
 
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
@@ -61,6 +66,8 @@ int main(int argc, char* argv[]) {
     int player1Score = 0;
     int player2Score = 0;
 
+
+
     while (running) {
 
         std::string scoreText = std::to_string(player1Score) + "        " + std::to_string(player2Score);
@@ -108,16 +115,12 @@ int main(int argc, char* argv[]) {
         }
 
         if (ball.ballPos.x > SCREEN_WIDTH) {
-            ball.ballPos.x = SCREEN_WIDTH*0.5;
-            ball.ballPos.y = SCREEN_HEIGHT*0.5;
-            roundDelayTimer = 2.0f;
+            RespawnBall(ball, roundDelayTimer);
             player1Score++;
         }
 
         if  (ball.ballPos.x < 0) {
-            ball.ballPos.x = SCREEN_WIDTH*0.5;
-            ball.ballPos.y = SCREEN_HEIGHT*0.5;
-            roundDelayTimer = 2.0f;
+            RespawnBall(ball, roundDelayTimer);
             player2Score++;
         }
 
