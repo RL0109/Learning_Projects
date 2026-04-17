@@ -28,6 +28,7 @@ int main(int argc, char* argv[]) {
     Ball ball( 350.0f, 250.0f, 10.0f, 10.0f, BALL_SPEED);
 
     float roundDelayTimer = 2.0f;
+    float AIDelayTimer = EASY_DIFFICULTY_MODIFIER;
 
 
     // stride is the amount of data per line object stored in the array
@@ -76,7 +77,6 @@ int main(int argc, char* argv[]) {
         Uint64 now = SDL_GetTicks();
         float dt = (now - lastTime) / 1000.0f;
         lastTime = now;
-
         fpsTimer += dt;
         frameCount++;
 
@@ -122,6 +122,14 @@ int main(int argc, char* argv[]) {
         if  (ball.ballPos.x < 0) {
             RespawnBall(ball, roundDelayTimer);
             player2Score++;
+        }
+
+        if (player2.player.y - EASY_DIFFICULTY_MODIFIER < ball.ballPos.y) {
+             player2.player.y += 1.0f;
+        } 
+
+        if (player2.player.y + EASY_DIFFICULTY_MODIFIER > ball.ballPos.y) {
+                player2.player.y -= 1.0f;             
         }
 
         if (ball.ballPos.x > player1.player.x && ball.ballPos.x < player1.player.x + player1.width) {
