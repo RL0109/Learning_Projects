@@ -22,7 +22,7 @@ class thread_guard {
 
 
 void task() {
-    std::cout << "This task is running." << "\n";
+    std::cout << "This task is running. " << "\n";
 
     const char frames[] = {'\\','|','/' , '-'};
 
@@ -38,13 +38,24 @@ void task() {
 
 
 int main() {
+    
     std::thread t1(task);
-    thread_guard guard(t1);
+    thread_guard guard1(t1);
 
-
-    if (t1.joinable()) {
-        t1.join();
+    {
+        std::thread t2(task);
+        thread_guard guard2(t2); // Program will terminate without thread guard
     }
 
+    try {
+        std::thread t3(task);
+        thread_guard guard3(t3); // Program will terminate without thread guard.
 
+        throw std::runtime_error("Some error occured");
+    } catch (const std::exception &e) {
+        std::cout << "Caught exception: " << e.what() << "\n";
+    }
+
+        std::cout << "Program ended cleanly." << "\n";
+    return 0;
 }
