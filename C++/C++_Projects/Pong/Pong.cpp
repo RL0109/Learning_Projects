@@ -2,7 +2,7 @@
 #include "paddle.h"
 #include "ball.h"
 
-#include <SDL3_mixer/SDL_mixer.h>
+#include <SDL_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
 void RespawnBall(Ball& ball, float& timer) {
@@ -14,10 +14,19 @@ void RespawnBall(Ball& ball, float& timer) {
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
+    MIX_Init();
     TTF_Font* font = TTF_OpenFont("build/ARIAL.TTF", 64);
     if(!font) {
         std::cout << "Failed to load font: " << SDL_GetError() << std::endl;
         return -1;
+    }
+    if (!MIX_Init()) {
+        std::cout << "Mixer Init Error: " << SDL_GetError() << std::endl;
+        return -1;
+    }
+    MIX_Mixer* mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+    if (mixer == NULL) {
+        std::cout << "Mixer Error: " << SDL_GetError() << std::endl;
     }
 
     SDL_Window* window = SDL_CreateWindow("PONG", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
