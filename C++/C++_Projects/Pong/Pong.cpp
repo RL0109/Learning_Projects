@@ -2,6 +2,7 @@
 #include "paddle.h"
 #include "ball.h"
 
+#include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
 void RespawnBall(Ball& ball, float& timer) {
