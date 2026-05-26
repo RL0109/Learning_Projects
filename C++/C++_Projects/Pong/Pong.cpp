@@ -2,6 +2,7 @@
 #include "paddle.h"
 #include "ball.h"
 
+#include <SDL3_mixer/SDL_mixer.h>
 #include <SDL3_ttf/SDL_ttf.h>
 
 void RespawnBall(Ball& ball, float& timer) {
@@ -13,11 +14,27 @@ void RespawnBall(Ball& ball, float& timer) {
 int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
+    MIX_Init();
     TTF_Font* font = TTF_OpenFont("build/ARIAL.TTF", 64);
     if(!font) {
         std::cout << "Failed to load font: " << SDL_GetError() << std::endl;
         return -1;
     }
+    if (!MIX_Init()) {
+        std::cout << "Mixer Init Error: " << SDL_GetError() << std::endl;
+        return -1;
+    }
+    MIX_Mixer* mixer = MIX_CreateMixerDevice(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, NULL);
+    if (mixer == NULL) {
+        std::cout << "Mixer Error: " << SDL_GetError() << std::endl;
+        return -1;
+    }
+
+    const char* audiopath = "Sounds/Hit_sound.wav";
+    // Load audio from file
+    MIX_Audio* mixedAudio = MIX_LoadAudio(mixer, audiopath, true);
+    // Put audio on playback
+    MIX_Track* mixedTrack = MIX_CreateTrack(mixer);
 
     SDL_Window* window = SDL_CreateWindow("PONG", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 
@@ -135,6 +152,7 @@ int main(int argc, char* argv[]) {
         if (ball.ballPos.x > player1.player.x && ball.ballPos.x < player1.player.x + player1.width) {
             if (ball.ballPos.y > player1.player.y && ball.ballPos.y < player1.player.y + player1.height)
                 {
+                    MIX_PlayAudio(mixer, mixedAudio);
                     float intersect = (ball.ballPos.y + (ball.height /2)) - (player1.player.y + (player1.height /2.0f)); 
                     float relIntersect = intersect / (player1.height/2.0f);
                     float bounceAngle = relIntersect * (M_PI /4.0f);
@@ -146,6 +164,7 @@ int main(int argc, char* argv[]) {
         if (ball.ballPos.x < player2.player.x && ball.ballPos.x > player2.player.x - player2.width) {
             if (ball.ballPos.y > player2.player.y && ball.ballPos.y < player2.player.y + player2.height) 
                 {
+                    MIX_PlayAudio(mixer, mixedAudio);
                     float intersect = (ball.ballPos.y + (ball.height /2.0f)) - (player2.player.y + (player2.height /2.0f)); 
                     float relIntersect = intersect / (player2.height/2.0f);
                     float bounceAngle = relIntersect * (M_PI /4.0f);
