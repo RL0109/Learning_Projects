@@ -70,7 +70,7 @@ template <typename T> class LinkedListDeque {
                 size += 1;
             } else {
                 ListNode* oldLast = sentinel.prev;
-                ListNode* last = new ListNode(x, &sentinel, &sentinel);
+                ListNode* last = new ListNode(x, &sentinel, oldLast);
                 sentinel.prev->next = last;
                 sentinel.prev = last;
                 
@@ -128,7 +128,9 @@ template <typename T> class LinkedListDeque {
             sentinel.prev = sentinel.prev->prev;
             sentinel.prev->next = &sentinel;
             size--;
-            return temp->item;
+            T oldLast = temp->item;
+            delete temp;
+            return oldLast;
         }
 
         T removeFirst() {
@@ -140,7 +142,9 @@ template <typename T> class LinkedListDeque {
             sentinel.next = sentinel.next->next;
             sentinel.next->prev = &sentinel; 
             size--;
-            return temp->item;
+            T oldFirst = temp->item;
+            delete temp;
+            return oldFirst;
         }
 
         T get(int index) {
