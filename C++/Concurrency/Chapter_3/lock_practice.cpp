@@ -110,7 +110,7 @@ template <typename T> class LinkedListDeque {
         }
 
         bool isEmpty() {
-            if (size == 0) {
+            if (sentinel.next == &sentinel && sentinel.prev == &sentinel) {
                 return true;
             }
             return false;
@@ -126,17 +126,13 @@ int main()
 {
 
     LinkedListDeque<int> test;
-    if(!test.isEmpty()) {
-        std::cout << "Linked list is empty!" << "\n";
-    }
+
     test.addFirst(7);
     test.addLast(14);
     test.addFirst(14);
     test.addLast(8);
     test.addFirst(0);
-    if(test.isEmpty()) {
-        std::cout << "Linked list is empty!" << "\n";
-    }
+    
     auto List = test.toList();
 
     for (auto t : List) {
