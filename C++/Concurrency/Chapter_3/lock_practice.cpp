@@ -117,6 +117,46 @@ template <typename T> class LinkedListDeque {
         }
 
         int Size () {return size;}
+
+
+        T removeLast() {
+            if (isEmpty() == true) {
+                return NULL;
+            }
+
+            ListNode* temp = sentinel.prev;
+            sentinel.prev = sentinel.prev->prev;
+            sentinel.prev->next = &sentinel;
+            size--;
+            return temp->item;
+        }
+
+        T removeFirst() {
+            if (isEmpty() == true) {
+                return NULL;
+            }
+
+            ListNode* temp = sentinel.next;
+            sentinel.next = sentinel.next->next;
+            sentinel.next->prev = &sentinel; 
+            size--;
+            return temp->item;
+        }
+
+        T get(int index) {
+            if (index >= size) {
+                return NULL;
+            }
+
+            ListNode* p = sentinel.next;
+
+            while (index != 0) {
+                p = p->next;
+                --index;
+            }
+            return p->item;
+        }
+
 };
 
 
@@ -132,11 +172,7 @@ int main()
     test.addFirst(14);
     test.addLast(8);
     test.addFirst(0);
-    
-    auto List = test.toList();
 
-    for (auto t : List) {
-        std::cout << t << "\n";
-    }
+    std::cout << test.get(2) << "\n";
 
 }
