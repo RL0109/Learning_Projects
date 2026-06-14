@@ -71,7 +71,7 @@ int main () {
 
             DrawSphere(tloc1, Nitrogen.radius * modelScale, Nitrogen.color);
             DrawSphere(tloc2, Oxygen.radius * modelScale, Oxygen.color);
-            DrawCylinderEx(tloc1, tloc2, 1, 1, 8, LIGHTGRAY);
+            DrawCylinderEx(tloc1, tloc2, 1 * modelScale, 1 * modelScale, 8, LIGHTGRAY);
 
             EndMode3D();
             DrawText("An Oxygen and Nitrogen in a molecular viewer!", 20, 20, 20, LIGHTGRAY);
