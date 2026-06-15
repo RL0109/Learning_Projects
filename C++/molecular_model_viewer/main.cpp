@@ -10,12 +10,12 @@ int main () {
     InitWindow(800, 450, "Molecular Model Viewer");
     SetTargetFPS(60);
 
-    Vector3 loc1 = {-25,0,1};
-    Vector3 loc2 = {25, 0, 1};
+    Vector3 loc1 = {-25,0,0};
+    Vector3 loc2 = {25, 0, 0};
 
     Vector3 startPos = {0,0,50};
     Vector3 upPos = {0, 1, 0};
-    Camera3D camera = {startPos, loc1, upPos, 90, CAMERA_PERSPECTIVE};
+    Camera3D camera = {startPos, {0,0,0}, upPos, 90, CAMERA_PERSPECTIVE};
 
     float atomicSizeToSize = 0.15f;
     float modelScale = 1.0f;
@@ -39,8 +39,20 @@ int main () {
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             Vector2 mouseDelta = GetMouseDelta();
-            rotationX += mouseDelta.x * 0.05f;
-            rotationY += mouseDelta.y * 0.05f;
+            rotationX += mouseDelta.y * 0.015f;
+            rotationY += mouseDelta.x * 0.015f;
+        }
+
+        int key = GetKeyPressed();
+
+        if (key != 0) 
+        std::cout << key << "\n";
+
+        if (key == 65 || key == 263) {
+            
+            loc1.x -= 1.0f;
+            loc2.x -= 1.0f;
+            
         }
 
 
@@ -56,13 +68,13 @@ int main () {
         Matrix rotationMat = MatrixRotateXYZ(rotationVector);
         Matrix scaleMatrix = MatrixScale(modelScale, modelScale, modelScale);
 
-        Matrix transformMatrix = MatrixMultiply(rotationMat, scaleMatrix);
+        Matrix transformMatrix = MatrixMultiply(scaleMatrix, rotationMat);
 
 
 
         BeginDrawing();
             //Indentation for clarity
-            ClearBackground(WHITE);
+            ClearBackground(BLACK);
             BeginMode3D(camera);
 
             Vector3 tloc1 = Vector3Transform(loc1, transformMatrix);
@@ -71,7 +83,7 @@ int main () {
 
             DrawSphere(tloc1, Nitrogen.radius * modelScale, Nitrogen.color);
             DrawSphere(tloc2, Oxygen.radius * modelScale, Oxygen.color);
-            DrawCylinderEx(tloc1, tloc2, 1 * modelScale, 1 * modelScale, 8, LIGHTGRAY);
+            DrawCylinderEx(tloc1, tloc2, 1 * modelScale, 1 * modelScale, 8, WHITE);
 
             EndMode3D();
             DrawText("An Oxygen and Nitrogen in a molecular viewer!", 20, 20, 20, LIGHTGRAY);
