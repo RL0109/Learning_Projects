@@ -1,11 +1,17 @@
 #include <iostream>
-#include "atom.h"
 #include "raylib.h"
 #include "raymath.h"
+#include "pdb_file_parser.h"
+#include <fstream>
 
 
 
 int main () {
+    
+    //Open text file
+    ifstream molecularFile("LEU.cif");
+    
+    PDBFileParser parsedFile(molecularFile);
 
     InitWindow(800, 450, "Molecular Model Viewer");
     SetTargetFPS(60);
@@ -22,37 +28,12 @@ int main () {
     float rotationX = 0.0f;
     float rotationY = 0.0f;
 
-
-    Atom Nitrogen= Atom();
-    Nitrogen.atomName = "Nitrogen";
-    Nitrogen.position = loc1;
-    Nitrogen.radius = 56.0f * atomicSizeToSize;
-    Nitrogen.color = BLUE; 
-
-    Atom Oxygen;
-    Oxygen.atomName = "Oxygen";
-    Oxygen.position = loc2;
-    Oxygen.radius = 48.0f * atomicSizeToSize;
-    Oxygen.color = RED;
-
     while (!WindowShouldClose()) {
 
         if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
             Vector2 mouseDelta = GetMouseDelta();
             rotationX += mouseDelta.y * 0.015f;
             rotationY += mouseDelta.x * 0.015f;
-        }
-
-        int key = GetKeyPressed();
-
-        if (key != 0) 
-        std::cout << key << "\n";
-
-        if (key == 65 || key == 263) {
-            
-            loc1.x -= 1.0f;
-            loc2.x -= 1.0f;
-            
         }
 
 
@@ -77,13 +58,18 @@ int main () {
             ClearBackground(BLACK);
             BeginMode3D(camera);
 
-            Vector3 tloc1 = Vector3Transform(loc1, transformMatrix);
-            Vector3 tloc2 = Vector3Transform(loc2, transformMatrix);
+
+            
+            for (int i = 0; i < parsedFile.atomData.size(); i++) {
+                DrawSphere(Vector3Transform(parsedFile.atomData[i].position, transformMatrix), 2.0f, RED);
+            }
+            // Vector3 tloc1 = Vector3Transform(loc1, transformMatrix);
+            // Vector3 tloc2 = Vector3Transform(loc2, transformMatrix);
 
 
-            DrawSphere(tloc1, Nitrogen.radius * modelScale, Nitrogen.color);
-            DrawSphere(tloc2, Oxygen.radius * modelScale, Oxygen.color);
-            DrawCylinderEx(tloc1, tloc2, 1 * modelScale, 1 * modelScale, 8, WHITE);
+            // DrawSphere(tloc1, Nitrogen.radius * modelScale, Nitrogen.color);
+            // DrawSphere(tloc2, Oxygen.radius * modelScale, Oxygen.color);
+            // DrawCylinderEx(tloc1, tloc2, 1 * modelScale, 1 * modelScale, 8, WHITE);
 
             EndMode3D();
             DrawText("An Oxygen and Nitrogen in a molecular viewer!", 20, 20, 20, LIGHTGRAY);
