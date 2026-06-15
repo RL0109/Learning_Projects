@@ -4,9 +4,15 @@
 #include <vector>
 #include <sstream>
 #include "raylib.h"
-#include "atom.h"
+
 
 using std::ifstream, std::cout, std::cerr, std::cin, std::string, std::vector;
+
+struct Atom {
+    Vector3 position;
+    char elementId;
+};
+
 
 class PDBFileParser {
     
