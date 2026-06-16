@@ -25,12 +25,14 @@ class PDBFileParser {
     };
 
     struct Bond {
-    Vector3 startPos;
-    Vector3 endPos;
+        Vector3 startPos;
+        Vector3 endPos;
+        char connectId;
 
-        Bond(Vector3 sP, Vector3 eP) {
+        Bond(Vector3 sP, Vector3 eP, char cId) {
             startPos = sP;
             endPos = eP;
+            connectId = cId;
         }
     };
 
@@ -44,7 +46,7 @@ class PDBFileParser {
 
     PDBFileParser(ifstream &moleculeFile) {
         parseFile(moleculeFile);
-        getCoordinates(moleculedata);
+        getCoordinates();
         centerMolecule();
         getBonds();
     }
@@ -70,7 +72,7 @@ class PDBFileParser {
         bool finishedHeader = false;
 
         while (std::getline(moleculeFile , line)) {
-            if (line.rfind("_chem_comp_atom.comp_id", 0) == 0) {
+            if (line.rfind("_chem_comp_atom.comp_id",0 ) == 0) {
                 insideTargetLoop = true;
             }
             
@@ -95,25 +97,25 @@ class PDBFileParser {
 
 
 
-    void readData (const vector<vector<string>> &dataVector) {
+    // void readData (const vector<vector<string>> &dataVector) {
 
-        for (auto dv : dataVector) {
-            for (auto d : dv) {
-                std::cout << d << " ";
-            }
-            cout << "\n";
-        }
+    //     for (auto dv : dataVector) {
+    //         for (auto d : dv) {
+    //             std::cout << d << " ";
+    //         }
+    //         cout << "\n";
+    //     }
 
-    }
+    // }
 
-    void getCoordinates(const vector<vector<string>> &dataVector) {
+    void getCoordinates() {
     
-        for (int i = 1; i < dataVector[0].size(); i++ )
+        for (int i = 1; i < moleculedata.size(); i++ )
         {
             //Pull vector data from file
-            Vector3 coordinates = {stof(dataVector[i][12]), stof(dataVector[i][13]), stof(dataVector[i][14])};
+            Vector3 coordinates = {stof(moleculedata[i][12]), stof(moleculedata[i][13]), stof(moleculedata[i][14])};
             //Pull element character from file
-            char element = dataVector[i][1][0];
+            char element = moleculedata[i][1][0];
             //Applying coordinates and element to vector
             atomData.push_back(Atom(coordinates, element));
         }
@@ -148,7 +150,12 @@ class PDBFileParser {
             if (atomData[i].elementId != 'H') {
             for (int j = i; j < atomData.size(); j++) {
                 if (Vector3Distance(atomData[i].position, atomData[j].position) < 1.90001f && Vector3Distance(atomData[i].position, atomData[j].position) > 0.4f) {
-                        bondData.push_back(Bond(atomData[i].position, atomData[j].position));
+                        if (atomData[j].elementId != 'C')
+                        bondData.push_back(Bond(atomData[i].position, atomData[j].position, atomData[j].elementId));
+
+                        else {
+                            bondData.push_back(Bond(atomData[i].position, atomData[j].position, atomData[i].elementId));
+                        }
                 }
             }
             }

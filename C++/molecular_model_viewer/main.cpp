@@ -4,6 +4,11 @@
 #include "pdb_file_parser.h"
 #include "molecule_file_parser.h"
 #include <fstream>
+#include <unordered_map>
+
+std::unordered_map<char, Color> atomsToColors = {
+    {'O', RED}, {'H', WHITE}, {'N', BLUE}, {'C' , GRAY}
+};
 
 
 
@@ -59,8 +64,8 @@ int main () {
             }
             if (translate) {
                 Vector2 mouseDelta = GetMouseDelta();
-                translateX += mouseDelta.x;
-                translateY += mouseDelta.y;
+                translateX += mouseDelta.x * 0.015f;
+                translateY += -mouseDelta.y * 0.015f;
 
             }
         }
@@ -79,7 +84,7 @@ int main () {
         Matrix scaleMatrix = MatrixScale(modelScale, modelScale, modelScale);
         Matrix translateMatrix = MatrixTranslate(translateX, translateY, 0.0f);
 
-        Matrix transformMatrix = MatrixMultiply(scaleMatrix, rotationMat);
+        Matrix transformMatrix = MatrixMultiply( rotationMat, scaleMatrix);
         transformMatrix = MatrixMultiply(transformMatrix, translateMatrix);
 
 
@@ -92,13 +97,13 @@ int main () {
 
             
             for (int i = 0; i < parsedFile.atomData.size(); i++) {
-                DrawSphere(Vector3Transform(parsedFile.atomData[i].position, transformMatrix), 0.50f, RED);
+                DrawSphere(Vector3Transform(parsedFile.atomData[i].position, transformMatrix), 0.50f, atomsToColors[(parsedFile.atomData[i].elementId)]);
                           
             }
             for (int i = 0; i < parsedFile.bondData.size(); i++) {
                 DrawCylinderEx(Vector3Transform(parsedFile.bondData[i].startPos, transformMatrix), 
                     Vector3Transform(parsedFile.bondData[i].endPos, transformMatrix),
-                    .05f * modelScale, .05f * modelScale, 6, WHITE);
+                    .05f * modelScale, .05f * modelScale, 6, atomsToColors[parsedFile.bondData[i].connectId]);
             }
 
             EndMode3D();
