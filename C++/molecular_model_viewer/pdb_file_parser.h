@@ -19,7 +19,16 @@ struct Atom {
     } 
 };
 
-// Will create class implementation once logic is discovered.
+struct Bond {
+    Vector3 startPos;
+    Vector3 endPos;
+
+    Bond(Vector3 sP, Vector3 eP) {
+        startPos = sP;
+        endPos = eP;
+    }
+};
+
 class PDBFileParser {
     
     public:
