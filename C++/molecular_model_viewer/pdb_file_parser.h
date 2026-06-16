@@ -9,25 +9,6 @@
 
 using std::ifstream, std::cout, std::cerr, std::cin, std::string, std::vector, std::stof;
 
-struct Atom {
-    Vector3 position;
-    char elementId;
-
-    Atom(Vector3 pos, char eId) {
-        position = pos;
-        elementId = eId;
-    } 
-};
-
-struct Bond {
-    Vector3 startPos;
-    Vector3 endPos;
-
-    Bond(Vector3 sP, Vector3 eP) {
-        startPos = sP;
-        endPos = eP;
-    }
-};
 
 class PDBFileParser {
     
@@ -35,6 +16,7 @@ class PDBFileParser {
     struct Atom {
         Vector3 position;
         char elementId;
+        float size;
 
         Atom(Vector3 pos, char eId) {
             position = pos;
@@ -42,16 +24,29 @@ class PDBFileParser {
         } 
     };
 
+    struct Bond {
+    Vector3 startPos;
+    Vector3 endPos;
+
+        Bond(Vector3 sP, Vector3 eP) {
+            startPos = sP;
+            endPos = eP;
+        }
+    };
 
 
     vector<vector<string>> moleculedata;
     vector<string> columnHeader;
     vector<Vector3> coordinates;
     vector<Atom> atomData;
+    vector<Bond> bondData;
+    float size;
 
     PDBFileParser(ifstream &moleculeFile) {
         parseFile(moleculeFile);
         getCoordinates(moleculedata);
+        centerMolecule();
+        getBonds();
     }
 
     vector<string> lineParser(const string line) {
@@ -124,24 +119,43 @@ class PDBFileParser {
         }
     }
 
+    void centerMolecule() {
+        if (atomData.empty()) return;
+
+        Vector3 sum = {0.0f, 0.0f, 0.0f};
+
+        for (auto atom: atomData) {
+            sum.x = atom.position.x;
+            sum.y = atom.position.y;
+            sum.z = atom.position.z;
+        }
+
+        Vector3 centroid = {
+            sum.x / 1.0f,
+            sum.y / 1.0f,
+            sum.z / 1.0f
+        };
+
+        for (auto& atom : atomData) {
+            atom.position = Vector3Subtract(atom.position, centroid);
+        }
+
+    }
+
+    void getBonds() {
+
+        for (int i = 0; i < atomData.size(); i++) {
+            if (atomData[i].elementId != 'H') {
+            for (int j = i; j < atomData.size(); j++) {
+                if (Vector3Distance(atomData[i].position, atomData[j].position) < 1.90001f) {
+                        bondData.push_back(Bond(atomData[i].position, atomData[j].position));
+                }
+            }
+            }
+            
+
+        }
+    }
+
 
 };
-
-
-// int main() {
-//     //Open text file
-//     ifstream molecularFile("LEU.cif");
-    
-//     PDBFileParser parsedFile(molecularFile);
-
-//     for (int i = 0; i < parsedFile.atomData.size(); i++ ) {
-
-//         cout << parsedFile.atomData[i].position.x << " ";
-//         cout << parsedFile.atomData[i].position.y << " ";
-//         cout << parsedFile.atomData[i].position.z << "\n";
-
-//     }
-
-//     return 0;
-
-// }
