@@ -19,7 +19,7 @@ int main () {
     Vector3 loc1 = {-25,0,0};
     Vector3 loc2 = {25, 0, 0};
 
-    Vector3 startPos = {0,0,50};
+    Vector3 startPos = {0,0,25};
     Vector3 upPos = {0, 1, 0};
     Camera3D camera = {startPos, {0,0,0}, upPos, 90, CAMERA_PERSPECTIVE};
 
@@ -62,17 +62,16 @@ int main () {
             
             for (int i = 0; i < parsedFile.atomData.size(); i++) {
                 DrawSphere(Vector3Transform(parsedFile.atomData[i].position, transformMatrix), 2.0f, RED);
+                          
             }
-            // Vector3 tloc1 = Vector3Transform(loc1, transformMatrix);
-            // Vector3 tloc2 = Vector3Transform(loc2, transformMatrix);
-
-
-            // DrawSphere(tloc1, Nitrogen.radius * modelScale, Nitrogen.color);
-            // DrawSphere(tloc2, Oxygen.radius * modelScale, Oxygen.color);
-            // DrawCylinderEx(tloc1, tloc2, 1 * modelScale, 1 * modelScale, 8, WHITE);
+            for (int i = 0; i < parsedFile.bondData.size(); i++) {
+                DrawCylinderEx(Vector3Transform(parsedFile.bondData[i].startPos, transformMatrix), 
+                    Vector3Transform(parsedFile.bondData[i].endPos, transformMatrix),
+                    .05f * modelScale, .05f * modelScale, 6, WHITE);
+            }
 
             EndMode3D();
-            DrawText("An Oxygen and Nitrogen in a molecular viewer!", 20, 20, 20, LIGHTGRAY);
+            DrawText("A molecular model of leucine!", 20, 20, 20, LIGHTGRAY);
         EndDrawing();
 
     }
@@ -83,5 +82,5 @@ int main () {
 
 
 
-
+    return 0;
 }
