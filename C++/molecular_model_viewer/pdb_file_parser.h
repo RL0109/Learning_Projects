@@ -147,7 +147,7 @@ class PDBFileParser {
         for (int i = 0; i < atomData.size(); i++) {
             if (atomData[i].elementId != 'H') {
             for (int j = i; j < atomData.size(); j++) {
-                if (Vector3Distance(atomData[i].position, atomData[j].position) < 1.90001f) {
+                if (Vector3Distance(atomData[i].position, atomData[j].position) < 1.90001f && Vector3Distance(atomData[i].position, atomData[j].position) > 0.4f) {
                         bondData.push_back(Bond(atomData[i].position, atomData[j].position));
                 }
             }
